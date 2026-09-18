@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interaktif Matematika Kelas 8 - Desimal, Akar & Pangkat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for Math Formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .gradient-header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Header Navigation -->
+    <header class="gradient-header text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/30 border border-indigo-400/30 flex items-center justify-center text-indigo-200">
+                    <i class="fa-solid fa-square-root-variable text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight">Quiz Matematika Class 8</h1>
+                    <p class="text-xs text-indigo-200 hidden sm:block">Cambridge Secondary 1 • Desimal, Akar & Pangkat</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Live Stats -->
+                <div class="flex items-center gap-3 bg-indigo-900/60 px-3 py-1.5 rounded-xl border border-indigo-400/20 text-xs">
+                    <div>
+                        <span class="text-indigo-300 block text-[10px] uppercase font-bold">Terjawab</span>
+                        <span id="answered-counter" class="font-mono font-bold text-emerald-400">0 / 30</span>
+                    </div>
+                    <div class="h-6 w-px bg-indigo-700/60"></div>
+                    <div>
+                        <span class="text-indigo-300 block text-[10px] uppercase font-bold">Skor Sementar</span>
+                        <span id="score-counter" class="font-mono font-bold text-amber-300">0 Pts</span>
+                    </div>
+                </div>
+
+                <!-- Reset Button -->
+                <button onclick="confirmResetQuiz()" title="Ulangi Quiz Dari Awal" class="bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-400/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i> <span class="hidden md:inline">Reset</span>
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-indigo-950 h-1.5">
+            <div id="quiz-progress-bar" class="bg-gradient-to-r from-emerald-400 to-indigo-400 h-1.5 transition-all duration-300" style="width: 0%;"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Navigation Grid Palette (Desktop: 4 cols, Mobile: Top/Accordion) -->
+        <aside class="lg:col-span-4 xl:col-span-3 space-y-4">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm sticky top-20">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-grip text-indigo-600"></i> Navigasi Soal (1-30)
+                    </h2>
+                    <span class="text-[11px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded">30 Soal</span>
+                </div>
+
+                <!-- Legend -->
+                <div class="grid grid-cols-3 gap-2 text-[10px] mb-4 pb-3 border-b border-slate-100 font-semibold">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Belum
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Benar
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> Salah
+                    </div>
+                </div>
+
+                <!-- Question Grid Buttons -->
+                <div class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto custom-scrollbar p-1" id="question-grid">
+                    <!-- Dynamic Grid Buttons generated by JS -->
+                </div>
+
+                <!-- Submit All Button -->
+                <button onclick="finishQuiz()" class="w-full mt-5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-flag-checkered"></i> Selesai & Lihat Hasil Akhir
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right Column: Question Viewer Card -->
+        <main class="lg:col-span-8 xl:col-span-9 space-y-6">
+            
+            <!-- Active Question Card -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm relative min-h-[420px] flex flex-col justify-between" id="question-card">
+                <div>
+                    <!-- Question Header Badge -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span id="q-number-badge" class="bg-indigo-600 text-white text-xs font-extrabold px-3 py-1 rounded-lg">Soal #1</span>
+                            <span id="q-category-badge" class="bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold px-2.5 py-1 rounded-lg">Operasi Desimal</span>
+                        </div>
+                        <span id="q-status-text" class="text-xs font-semibold text-slate-400">
+                            <i class="fa-regular fa-circle-question"></i> Belum Dijawab
+                        </span>
+                    </div>
+
+                    <!-- Question Prompt Text -->
+                    <div class="text-slate-800 font-semibold text-base sm:text-lg leading-relaxed mb-6" id="q-text">
+                        <!-- LaTeX question text rendered here -->
+                    </div>
+
+                    <!-- Answer Options Container -->
+                    <div class="space-y-3 mb-6" id="q-options-container">
+                        <!-- Options generated dynamically -->
+                    </div>
+
+                    <!-- Explanation Box (Appears after answer is selected) -->
+                    <div id="explanation-box" class="hidden rounded-xl p-4 text-xs leading-relaxed border transition-all duration-200">
+                        <!-- Dynamic feedback text -->
+                    </div>
+                </div>
+
+                <!-- Question Footer Navigation Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-6">
+                    <button id="btn-prev" onclick="prevQuestion()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                    </button>
+                    
+                    <span class="text-xs font-bold text-slate-400" id="page-indicator">1 / 30</span>
+
+                    <button id="btn-next" onclick="nextQuestion()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        Berikutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Final Results Summary -->
+    <div id="results-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-slate-200 shadow-2xl space-y-6 my-8">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl mx-auto font-black shadow-inner">
+                    <i class="fa-solid fa-trophy text-amber-500"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-900">Hasil Akhir Quiz</h2>
+                <p class="text-xs text-slate-500">Berikut adalah rekapitulasi performa Anda dalam kuis ini.</p>
+            </div>
+
+            <!-- Score Big Numbers -->
+            <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Skor Akhir</span>
+                    <span id="final-score-val" class="text-2xl sm:text-3xl font-black text-indigo-600">0</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Persentase</span>
+                    <span id="final-percent-val" class="text-2xl sm:text-3xl font-black text-emerald-600">0%</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase block">Benar / Total</span>
+                    <span id="final-correct-val" class="text-2xl sm:text-3xl font-black text-slate-800">0 / 30</span>
+                </div>
+            </div>
+
+            <!-- Subtopic Breakdown -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Akurasi Per Subtopik</h3>
+                
+                <div class="space-y-2 text-xs">
+                    <div>
+                        <div class="flex justify-between font-semibold mb-1">
+                            <span>Operasi Desimal & Trik Hitung</span>
+                            <span id="acc-desimal">0 / 10</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div id="bar-desimal" class="bg-indigo-600 h-2 rounded-full transition-all" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between font-semibold mb-1">
+                            <span>Akar Kuadrat & Estimasi</span>
+                            <span id="acc-akar">0 / 10</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div id="bar-akar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between font-semibold mb-1">
+                            <span>Pangkat 3 & Akar Pangkat 3</span>
+                            <span id="acc-pangkat">0 / 10</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div id="bar-pangkat" class="bg-amber-500 h-2 rounded-full transition-all" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-slate-100">
+                <button onclick="closeModal()" class="w-full sm:w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition">
+                    Tinjau Kembali Jawaban
+                </button>
+                <button onclick="confirmResetQuiz()" class="w-full sm:w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Ulangi Quiz Dari Awal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // 30 Verified Questions Database
+        const questionsData = [
+            // --- TOPIC 1: OPERASI DESIMAL & TRIK (1-10) ---
+            {
+                id: 1,
+                category: "Operasi Desimal",
+                question: "Hitunglah hasil dari operasi campuran berikut:\n$$0.35 + 1.284 - 0.79$$",
+                options: ["$0.744$", "$0.794$", "$0.844$", "$0.894$"],
+                correctIndex: 2, // C
+                explanation: "Langkah 1: Penjumlahan $0.350 + 1.284 = 1.634$.\nLangkah 2: Pengurangan $1.634 - 0.790 = 0.844$."
+            },
+            {
+                id: 2,
+                category: "Operasi Desimal",
+                question: "Hitunglah hasil perkalian desimal cepat berikut:\n$$0.15 \\times 0.04$$",
+                options: ["$0.06$", "$0.006$", "$0.0006$", "$0.6$"],
+                correctIndex: 1, // B
+                explanation: "Kalikan angka utama: $15 \\times 4 = 60$. Total angka di belakang koma adalah $2 + 2 = 4$ angka desimal. Maka $60 \\rightarrow 0.0060 = 0.006$."
+            },
+            {
+                id: 3,
+                category: "Operasi Desimal",
+                question: "Berapakah hasil dari pembagian desimal berikut:\n$$1.8 \\div 0.03$$",
+                options: ["$6$", "$0.6$", "$600$", "$60$"],
+                correctIndex: 3, // D
+                explanation: "Gunakan trik perkalian $100$ pada pembagi dan pembilang: $\\frac{1.8 \\times 100}{0.03 \\times 100} = \\frac{180}{3} = 60$."
+            },
+            {
+                id: 4,
+                category: "Operasi Desimal",
+                question: "Hitunglah nilai dari pecahan desimal berikut:\n$$\\frac{0.48 \\times 0.2}{0.016}$$",
+                options: ["$6$", "$0.6$", "$60$", "$0.06$"],
+                correctIndex: 0, // A
+                explanation: "Pembilang $= 0.48 \\times 0.2 = 0.096$. Pembagian $\\frac{0.096}{0.016} = \\frac{0.096 \\times 1000}{0.016 \\times 1000} = \\frac{96}{16} = 6$."
+            },
+            {
+                id: 5,
+                category: "Operasi Desimal",
+                question: "Sebuah toko buku menjual 4 buah buku dengan harga $\$12.50$ per buah. Jika pembeli mendapat kupon potongan harga total sebesar $\$3.75$, berapa total uang yang harus dibayar?",
+                options: ["$\\$45.25$", "$\\$47.25$", "$\\$46.25$", "$\\$48.75$"],
+                correctIndex: 2, // C
+                explanation: "Total harga 4 buku $= 4 \\times 12.50 = \\$50.00$. Setelah potongan harga $= 50.00 - 3.75 = \\$46.25$."
+            },
+            {
+                id: 6,
+                category: "Operasi Desimal",
+                question: "Hasil dari $3.6 \\times 0.005$ adalah...",
+                options: ["$0.018$", "$0.18$", "$0.0018$", "$1.8$"],
+                correctIndex: 0, // A
+                explanation: "Perkalian utama: $36 \\times 5 = 180$. Jumlah angka di belakang koma $= 1 + 3 = 4$ digit desimal. Bergeser 4 kali: $0.0180 = 0.018$."
+            },
+            {
+                id: 7,
+                category: "Operasi Desimal",
+                question: "Hitunglah nilai dari $0.072 \\div 0.0009$",
+                options: ["$8$", "$0.8$", "$800$", "$80$"],
+                correctIndex: 3, // D
+                explanation: "Kalikan kedua bilangan dengan $10000$ agar pembagi bulat: $\\frac{0.072 \\times 10000}{0.0009 \\times 10000} = \\frac{720}{9} = 80$."
+            },
+            {
+                id: 8,
+                category: "Operasi Desimal",
+                question: "Ibu membeli $2.4\\text{ kg}$ gula pasir seharga Rp $15.000,00$ per kg dan $1.75\\text{ kg}$ tepung seharga Rp $12.000,00$ per kg. Total belanjaan Ibu adalah...",
+                options: ["Rp 55.000,00", "Rp 57.000,00", "Rp 58.500,00", "Rp 60.000,00"],
+                correctIndex: 1, // B
+                explanation: "Gula $= 2.4 \\times 15000 = 36.000$. Tepung $= 1.75 \\times 12000 = 21.000$. Total $= 36.000 + 21.000 = \\text{Rp } 57.000,00$."
+            },
+            {
+                id: 9,
+                category: "Operasi Desimal",
+                question: "Hasil perkalian cepat $0.125 \\times 80$ adalah...",
+                options: ["$10$", "$1$", "$100$", "$8$"],
+                correctIndex: 0, // A
+                explanation: "Trik pecahan: Ingat bahwa $0.125 = \\frac{1}{8}$. Maka $\\frac{1}{8} \\times 80 = 10$."
+            },
+            {
+                id: 10,
+                category: "Operasi Desimal",
+                question: "Hitunglah nilai dari ekspresi desimal berikut:\n$$(0.6 \\times 0.5) + (1.2 \\div 0.4)$$",
+                options: ["$0.6$", "$3.03$", "$3.6$", "$3.3$"],
+                correctIndex: 3, // D
+                explanation: "Langkah 1: $0.6 \\times 0.5 = 0.30 = 0.3$.\nLangkah 2: $1.2 \\div 0.4 = 12 \\div 4 = 3$.\nLangkah 3: $0.3 + 3 = 3.3$."
+            },
+
+            // --- TOPIC 2: AKAR KUADRAT & ESTIMASI (11-20) ---
+            {
+                id: 11,
+                category: "Akar Kuadrat",
+                question: "Berapakah nilai dari $\\sqrt{0.0049}$?",
+                options: ["$0.7$", "$0.07$", "$0.007$", "$0.49$"],
+                correctIndex: 1, // B
+                explanation: "$\\sqrt{0.0049} = \\sqrt{\\frac{49}{10000}} = \\frac{\\sqrt{49}}{\\sqrt{10000}} = \\frac{7}{100} = 0.07$."
+            },
+            {
+                id: 12,
+                category: "Akar Kuadrat",
+                question: "Hasil kuadrat dari $(1.4)^2$ adalah...",
+                options: ["$19.6$", "$0.196$", "$1.96$", "$1.44$"],
+                correctIndex: 2, // C
+                explanation: "$14^2 = 196$. Karena ada $1$ desimal dipangkatkan 2, hasilnya memiliki $2$ tempat desimal $\\rightarrow 1.96$."
+            },
+            {
+                id: 13,
+                category: "Akar Kuadrat",
+                question: "Hitunglah nilai penjumlahan akar berikut:\n$$\\sqrt{1.44} + \\sqrt{0.25}$$",
+                options: ["$1.7$", "$1.69$", "$1.3$", "$1.8$"],
+                correctIndex: 0, // A
+                explanation: "$\\sqrt{1.44} = 1.2$ dan $\\sqrt{0.25} = 0.5$. Jumlahnya $= 1.2 + 0.5 = 1.7$."
+            },
+            {
+                id: 14,
+                category: "Akar Kuadrat",
+                question: "Estimasi nilai dari $\\sqrt{38}$ hingga 1 tempat desimal terdekat adalah...",
+                options: ["$5.8$", "$6.0$", "$6.5$", "$6.2$"],
+                correctIndex: 3, // D
+                explanation: "$6^2 = 36$ dan $7^2 = 49$. Angka 38 berada sangat dekat dengan 36. Estimasi $\\approx 6 + \\frac{38-36}{49-36} = 6 + \\frac{2}{13} \\approx 6.15 \\approx 6.2$."
+            },
+            {
+                id: 15,
+                category: "Akar Kuadrat",
+                question: "Sebuah bidang persegi memiliki luas $0.0144\\text{ m}^2$. Keliling persegi tersebut adalah...",
+                options: ["$0.12\\text{ m}$", "$0.48\\text{ m}$", "$0.24\\text{ m}$", "$0.36\\text{ m}$"],
+                correctIndex: 1, // B
+                explanation: "Sisi $s = \\sqrt{0.0144} = 0.12\\text{ m}$. Keliling $= 4 \\times s = 4 \\times 0.12 = 0.48\\text{ m}$."
+            },
+            {
+                id: 16,
+                category: "Akar Kuadrat",
+                question: "Nilai dari $\\sqrt{\\frac{0.81}{0.09}}$ adalah...",
+                options: ["$3$", "$0.3$", "$9$", "$0.9$"],
+                correctIndex: 0, // A
+                explanation: "Sederhanakan pecahan di dalam akar terlebih dahulu: $\\frac{0.81}{0.09} = \\frac{81}{9} = 9$. Maka $\\sqrt{9} = 3$."
+            },
+            {
+                id: 17,
+                category: "Akar Kuadrat",
+                question: "Jika $x^2 = 0.0625$, maka nilai $x$ positif yang memenuhi adalah...",
+                options: ["$0.025$", "$0.5$", "$0.25$", "$0.05$"],
+                correctIndex: 2, // C
+                explanation: "$x = \\sqrt{0.0625} = \\sqrt{\\frac{625}{10000}} = \\frac{25}{100} = 0.25$."
+            },
+            {
+                id: 18,
+                category: "Akar Kuadrat",
+                question: "Hitunglah nilai dari $(0.9)^2 - \\sqrt{0.49}$",
+                options: ["$0.32$", "$0.12$", "$0.21$", "$0.11$"],
+                correctIndex: 3, // D
+                explanation: "$(0.9)^2 = 0.81$ dan $\\sqrt{0.49} = 0.7$. Selisihnya $= 0.81 - 0.70 = 0.11$."
+            },
+            {
+                id: 19,
+                category: "Akar Kuadrat",
+                question: "Manakah estimasi terbaik untuk nilai $\\sqrt{80}$?",
+                options: ["$8.5$", "$8.9$", "$9.1$", "$8.1$"],
+                correctIndex: 1, // B
+                explanation: "Karena $9^2 = 81$, maka $\\sqrt{80}$ nilainya sangat dekat sedikit di bawah $9$, yaitu $\\approx 8.94 \\approx 8.9$."
+            },
+            {
+                id: 20,
+                category: "Akar Kuadrat",
+                question: "Panjang hipotenusa segitiga siku-siku dinyatakan sebagai $\\sqrt{0.09 + 0.16}$. Panjang hipotenusa tersebut adalah...",
+                options: ["$0.7$", "$0.35$", "$0.5$", "$0.25$"],
+                correctIndex: 2, // C
+                explanation: "$\\sqrt{0.09 + 0.16} = \\sqrt{0.25} = 0.5$."
+            },
+
+            // --- TOPIC 3: PANGKAT 3 & AKAR PANGKAT 3 (21-30) ---
+            {
+                id: 21,
+                category: "Pangkat 3 & Akar 3",
+                question: "Hitunglah nilai dari $(0.3)^3$",
+                options: ["$0.027$", "$0.27$", "$0.0027$", "$0.09$"],
+                correctIndex: 0, // A
+                explanation: "$3^3 = 27$. Karena dipangkatkan 3 dari 1 angka desimal, maka hasilnya memiliki $3$ angka di belakang koma $\\rightarrow 0.027$."
+            },
+            {
+                id: 22,
+                category: "Pangkat 3 & Akar 3",
+                question: "Berapakah nilai dari $\\sqrt[3]{0.000125}$?",
+                options: ["$0.5$", "$0.005$", "$0.25$", "$0.05$"],
+                correctIndex: 3, // D
+                explanation: "$\\sqrt[3]{0.000125} = \\sqrt[3]{\\frac{125}{1000000}} = \\frac{5}{100} = 0.05$."
+            },
+            {
+                id: 23,
+                category: "Pangkat 3 & Akar 3",
+                question: "Gunakan trik angka satuan untuk menentukan nilai dari $\\sqrt[3]{42875}$:",
+                options: ["$25$", "$35$", "$45$", "$15$"],
+                correctIndex: 1, // B
+                explanation: "Pisahkan: $42$ | $875$. Digit terakhir $5 \\rightarrow$ satuan $= 5$. Pangkat tiga terbesar di bawah $42$ adalah $3^3 = 27 \\rightarrow$ puluhan $= 3$. Hasil $= 35$."
+            },
+            {
+                id: 24,
+                category: "Pangkat 3 & Akar 3",
+                question: "Hitunglah hasil dari $(-0.4)^3$",
+                options: ["$-0.016$", "$-0.64$", "$-0.064$", "$0.064$"],
+                correctIndex: 2, // C
+                explanation: "Bilangan negatif dipangkatkan ganjil (3) hasilnya tetap negatif. $0.4^3 = 0.064 \\rightarrow -0.064$."
+            },
+            {
+                id: 25,
+                category: "Pangkat 3 & Akar 3",
+                question: "Sebuah wadah berbentuk kubus memiliki volume $0.216\\text{ m}^3$. Panjang rusuk kubus tersebut adalah...",
+                options: ["$0.6\\text{ m}$", "$0.06\\text{ m}$", "$0.36\\text{ m}$", "$1.2\\text{ m}$"],
+                correctIndex: 0, // A
+                explanation: "Rusuk $s = \\sqrt[3]{0.216} = \\sqrt[3]{\\frac{216}{1000}} = \\frac{6}{10} = 0.6\\text{ m}$."
+            },
+            {
+                id: 26,
+                category: "Pangkat 3 & Akar 3",
+                question: "Tentukan nilai dari $\\sqrt[3]{13824}$ tanpa kalkulator:",
+                options: ["$26$", "$34$", "$24$", "$14$"],
+                correctIndex: 2, // C
+                explanation: "Pisahkan: $13$ | $824$. Digit terakhir $4 \\rightarrow$ satuan $= 4$. Pangkat 3 terbesar di bawah $13$ adalah $2^3 = 8 \\rightarrow$ puluhan $= 2$. Hasil $= 24$."
+            },
+            {
+                id: 27,
+                category: "Pangkat 3 & Akar 3",
+                question: "Hitunglah nilai dari ekspresi berikut:\n$$\\sqrt[3]{0.064} + (0.2)^3$$",
+                options: ["$0.400$", "$0.408$", "$0.480$", "$0.048$"],
+                correctIndex: 1, // B
+                explanation: "$\\sqrt[3]{0.064} = 0.4$ dan $(0.2)^3 = 0.008$. Hasil penjumlahan $= 0.4 + 0.008 = 0.408$."
+            },
+            {
+                id: 28,
+                category: "Pangkat 3 & Akar 3",
+                question: "Jika volume sebuah kubus adalah $91125\\text{ cm}^3$, panjang sisinya adalah...",
+                options: ["$35\\text{ cm}$", "$55\\text{ cm}$", "$25\\text{ cm}$", "$45\\text{ cm}$"],
+                correctIndex: 3, // D
+                explanation: "$\\sqrt[3]{91125}$: Pisahkan $91$ | $125$. Satuan $= 5$. $4^3 = 64 < 91 < 5^3 = 125 \\rightarrow$ puluhan $= 4$. Panjang sisi $= 45\\text{ cm}$."
+            },
+            {
+                id: 29,
+                category: "Pangkat 3 & Akar 3",
+                question: "Hitunglah nilai dari pecahan $\\frac{\\sqrt[3]{0.008}}{0.1}$",
+                options: ["$2$", "$0.2$", "$20$", "$0.02$"],
+                correctIndex: 0, // A
+                explanation: "Pembilang $= \\sqrt[3]{0.008} = 0.2$. Pembagian $\\frac{0.2}{0.1} = 2$."
+            },
+            {
+                id: 30,
+                category: "Pangkat 3 & Akar 3",
+                question: "Nilai dari $\\sqrt[3]{-2744}$ adalah...",
+                options: ["$-24$", "$-16$", "$-18$", "$-14$"],
+                correctIndex: 3, // D
+                explanation: "Akar pangkat 3 dari negatif hasilnya negatif. $2744 \\rightarrow$ pisahkan $2$ | $744$. Satuan $4 \\rightarrow 4$. Puluhan $1^3 \\le 2 \\rightarrow 1$. Hasil $= -14$."
+            }
+        ];
+
+        // State variables
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { qId: selectedOptionIndex }
+        const STORAGE_KEY = "cambridge_math_quiz_v2_class8";
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedAnswers();
+            renderQuestionGrid();
+            loadQuestion(currentQuestionIndex);
+            updateHeaderStats();
+        });
+
+        // Save State to LocalStorage (Protects against offline/accidental reload)
+        function saveAnswers() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userAnswers));
+            } catch (e) {
+                console.error("Gagal menyimpan jawaban ke localStorage", e);
+            }
+        }
+
+        // Load Saved State
+        function loadSavedAnswers() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    userAnswers = JSON.parse(saved);
+                }
+            } catch (e) {
+                userAnswers = {};
+            }
+        }
+
+        // Render Sidebar Navigation Grid Palette (1-30)
+        function renderQuestionGrid() {
+            const gridContainer = document.getElementById('question-grid');
+            gridContainer.innerHTML = '';
+
+            questionsData.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.type = 'button';
+                
+                let bgClass = "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200";
+                
+                if (userAnswers.hasOwnProperty(q.id)) {
+                    const ans = userAnswers[q.id];
+                    if (ans === q.correctIndex) {
+                        bgClass = "bg-emerald-500 border-emerald-600 text-white font-bold shadow-sm";
+                    } else {
+                        bgClass = "bg-rose-500 border-rose-600 text-white font-bold shadow-sm";
+                    }
+                }
+
+                if (idx === currentQuestionIndex) {
+                    bgClass += " ring-2 ring-indigo-600 ring-offset-1";
+                }
+
+                btn.className = `w-full h-9 rounded-lg border font-mono text-xs flex items-center justify-center transition-all ${bgClass}`;
+                btn.innerText = idx + 1;
+                btn.onclick = () => jumpToQuestion(idx);
+
+                gridContainer.appendChild(btn);
+            });
+        }
+
+        // Display Active Question
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questionsData[index];
+
+            // Badges & Text
+            document.getElementById('q-number-badge').innerText = `Soal #${index + 1}`;
+            document.getElementById('q-category-badge').innerText = q.category;
+            document.getElementById('q-text').innerText = q.question;
+            document.getElementById('page-indicator').innerText = `${index + 1} / ${questionsData.length}`;
+
+            // Buttons State
+            document.getElementById('btn-prev').disabled = index === 0;
+            document.getElementById('btn-next').disabled = index === questionsData.length - 1;
+
+            // Status Indicator
+            const statusEl = document.getElementById('q-status-text');
+            if (userAnswers.hasOwnProperty(q.id)) {
+                const isCorrect = userAnswers[q.id] === q.correctIndex;
+                statusEl.className = isCorrect ? "text-xs font-bold text-emerald-600" : "text-xs font-bold text-rose-600";
+                statusEl.innerHTML = isCorrect ? 
+                    `<i class="fa-solid fa-circle-check"></i> Dijawab Benar` : 
+                    `<i class="fa-solid fa-circle-xmark"></i> Dijawab Salah`;
+            } else {
+                statusEl.className = "text-xs font-semibold text-slate-400";
+                statusEl.innerHTML = `<i class="fa-regular fa-circle-question"></i> Belum Dijawab`;
+            }
+
+            // Render Options
+            const optionsContainer = document.getElementById('q-options-container');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+            const hasAnswered = userAnswers.hasOwnProperty(q.id);
+            const selectedOpt = userAnswers[q.id];
+
+            q.options.forEach((optText, optIdx) => {
+                const optBtn = document.createElement('button');
+                optBtn.type = 'button';
+
+                let btnStyle = "bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300";
+                let badgeStyle = "bg-white border-slate-200 text-slate-600";
+
+                if (hasAnswered) {
+                    if (optIdx === q.correctIndex) {
+                        btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold ring-1 ring-emerald-500";
+                        badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+                    } else if (optIdx === selectedOpt && selectedOpt !== q.correctIndex) {
+                        btnStyle = "bg-rose-50 border-rose-400 text-rose-900 font-semibold ring-1 ring-rose-400";
+                        badgeStyle = "bg-rose-600 text-white border-rose-600";
+                    } else {
+                        btnStyle = "bg-slate-50 border-slate-100 text-slate-400 opacity-60";
+                    }
+                }
+
+                optBtn.className = `w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between text-sm ${btnStyle}`;
+                optBtn.onclick = () => selectOption(q.id, optIdx);
+
+                optBtn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg border font-bold text-xs flex items-center justify-center shrink-0 ${badgeStyle}">${optionLabels[optIdx]}</span>
+                        <span class="math-content">${optText}</span>
+                    </div>
+                    ${hasAnswered && optIdx === q.correctIndex ? '<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>' : ''}
+                    ${hasAnswered && optIdx === selectedOpt && selectedOpt !== q.correctIndex ? '<i class="fa-solid fa-circle-xmark text-rose-500 text-base"></i>' : ''}
+                `;
+
+                optionsContainer.appendChild(optBtn);
+            });
+
+            // Explanation Box
+            const expBox = document.getElementById('explanation-box');
+            if (hasAnswered) {
+                expBox.classList.remove('hidden');
+                const isCorrect = selectedOpt === q.correctIndex;
+                expBox.className = isCorrect ? 
+                    "rounded-xl p-4 text-xs leading-relaxed border bg-emerald-50 border-emerald-200 text-emerald-900" : 
+                    "rounded-xl p-4 text-xs leading-relaxed border bg-rose-50 border-rose-200 text-rose-900";
+
+                expBox.innerHTML = `
+                    <div class="font-bold text-sm mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid ${isCorrect ? 'fa-lightbulb text-amber-500' : 'fa-circle-exclamation text-rose-600'}"></i>
+                        ${isCorrect ? 'Pembahasan & Solusi Benar:' : 'Jawaban Belum Tepat. Pembahasan:'}
+                    </div>
+                    <div class="whitespace-pre-line mt-1 font-mono">${q.explanation}</div>
+                `;
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            renderQuestionGrid();
+            reRenderMath();
+        }
+
+        // Option Selection Handler
+        function selectOption(questionId, optionIndex) {
+            userAnswers[questionId] = optionIndex;
+            saveAnswers();
+            loadQuestion(currentQuestionIndex);
+            updateHeaderStats();
+        }
+
+        // Navigation controls
+        function nextQuestion() {
+            if (currentQuestionIndex < questionsData.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function jumpToQuestion(idx) {
+            loadQuestion(idx);
+        }
+
+        // Update Top Header Stats & Progress Bar
+        function updateHeaderStats() {
+            const answeredCount = Object.keys(userAnswers).length;
+            let correctCount = 0;
+
+            questionsData.forEach(q => {
+                if (userAnswers[q.id] === q.correctIndex) {
+                    correctCount++;
+                }
+            });
+
+            const score = Math.round((correctCount / questionsData.length) * 100);
+
+            document.getElementById('answered-counter').innerText = `${answeredCount} / ${questionsData.length}`;
+            document.getElementById('score-counter').innerText = `${score} Pts`;
+
+            const progressPct = (answeredCount / questionsData.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPct}%`;
+        }
+
+        // Trigger LaTeX Re-render
+        function reRenderMath() {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.getElementById('question-card'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+        }
+
+        // Final Quiz Completion Modal
+        function finishQuiz() {
+            const total = questionsData.length;
+            let correct = 0;
+            let catStats = {
+                "Operasi Desimal": { correct: 0, total: 10 },
+                "Akar Kuadrat": { correct: 0, total: 10 },
+                "Pangkat 3 & Akar 3": { correct: 0, total: 10 }
+            };
+
+            questionsData.forEach(q => {
+                if (userAnswers[q.id] === q.correctIndex) {
+                    correct++;
+                    if (catStats[q.category]) {
+                        catStats[q.category].correct++;
+                    }
+                }
+            });
+
+            const percent = Math.round((correct / total) * 100);
+
+            document.getElementById('final-score-val').innerText = `${correct * 10}`;
+            document.getElementById('final-percent-val').innerText = `${percent}%`;
+            document.getElementById('final-correct-val').innerText = `${correct} / ${total}`;
+
+            // Category breakdown
+            document.getElementById('acc-desimal').innerText = `${catStats["Operasi Desimal"].correct} / 10`;
+            document.getElementById('bar-desimal').style.width = `${(catStats["Operasi Desimal"].correct / 10) * 100}%`;
+
+            document.getElementById('acc-akar').innerText = `${catStats["Akar Kuadrat"].correct} / 10`;
+            document.getElementById('bar-akar').style.width = `${(catStats["Akar Kuadrat"].correct / 10) * 100}%`;
+
+            document.getElementById('acc-pangkat').innerText = `${catStats["Pangkat 3 & Akar 3"].correct} / 10`;
+            document.getElementById('bar-pangkat').style.width = `${(catStats["Pangkat 3 & Akar 3"].correct / 10) * 100}%`;
+
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('results-modal').classList.add('hidden');
+        }
+
+        // Reset Quiz Progress Confirm
+        function confirmResetQuiz() {
+            if (confirm("Apakah Anda yakin ingin mengulang quiz dari awal? Semua jawaban yang tersimpan akan dihapus.")) {
+                userAnswers = {};
+                localStorage.removeItem(STORAGE_KEY);
+                closeModal();
+                updateHeaderStats();
+                loadQuestion(0);
+            }
+        }
+    </script>
+</body>
+</html>
